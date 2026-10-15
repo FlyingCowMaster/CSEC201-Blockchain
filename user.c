@@ -13,15 +13,15 @@ struct User* add(struct User * head, char* Username) {
 	newHead->localLoginTime = *localtime(&(newHead->loginTime));
     newHead->next = head;
     if (head == NULL) {
-        newHead->hash.hash0 = 1; // Logical error: Incorrectly setting the initial hash
-        newHead->hash.hash1 = 2;
-        newHead->hash.hash2 = 3;
-        newHead->hash.hash3 = 4;
-        newHead->hash.hash4 = 5;
+        newHead->hash.hash0 = 0;
+        newHead->hash.hash1 = 0;
+        newHead->hash.hash2 = 0;
+        newHead->hash.hash3 = 0;
+        newHead->hash.hash4 = 0;
     }
     else {
        
-        generateDigest(&(newHead->hash), head); // Logical error: Generating digest for the wrong node
+        generateDigest(&(newHead->hash), head); 
     }
     
     return newHead;
@@ -64,11 +64,11 @@ void printUser(struct User* user) {
 
 void generateDigest(struct Digest* digest, struct User* User) {
     unsigned char* result = SSHA((unsigned char*)User, STRUCT_SIZE);
-    digest->hash0 = result[1]; // Logical error: Incorrectly calculating the hash
-    digest->hash1 = result[2];
-    digest->hash2 = result[3];
-    digest->hash3 = result[4];
-    digest->hash4 = result[5];
+    digest->hash0 = result[0];
+    digest->hash1 = result[1];
+    digest->hash2 = result[2];
+    digest->hash3 = result[3];
+    digest->hash4 = result[4];
 }
 void verify(struct User* curr) {
     int height = 2;
@@ -90,9 +90,9 @@ void verify(struct User* curr) {
 
         if (prev != NULL) {
             struct Digest prev_digest_computed;
-            generateDigest(&prev_digest_computed, curr->next); // Logical error: Generating digest for the wrong node
+            generateDigest(&prev_digest_computed, curr->next); 
 
-            if (digest_equal(prev_digest_computed, curr->hash)) { // Logical error: Comparing with the wrong hash
+            if (digest_equal(prev_digest_computed, curr->hash)) { 
                 printf("User %d passed\n", height);
                 printf("\t%-20s", "User Data:");
                 printUser(curr->next);
@@ -115,7 +115,7 @@ void verify(struct User* curr) {
             }
         }
         curr = prev;
-        prev = curr->next; // Logical error: Incorrect traversal logic
+        prev = curr->next; 
         height++;
     }
 
