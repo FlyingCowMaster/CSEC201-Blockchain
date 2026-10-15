@@ -44,3 +44,38 @@ int digest_equal(struct Digest digest1, struct Digest digest2) {
 void printDigest(struct Digest digest) {
     printf("%d %d %d %d %d\n", digest.hash0, digest.hash1, digest.hash2, digest.hash3, digest.hash4);
 }
+
+typedef struct {
+    uint32_t A, B, C, D, E;
+} SSHA2_state;
+
+SSHA2_state SSHA2(const unsigned char* msg, size_t length)
+{
+    /* Initial state (SHA-1 IVs; the diagram doesn't specify one) */
+    uint32_t A = 0x67452301;
+    uint32_t B = 0xEFCDAB89;
+    uint32_t C = 0x98BADCFE;
+    uint32_t D = 0x10325476;
+    uint32_t E = 0xC3D2E1F0;
+
+    for (size_t i = 0; i < length; i++) {
+        uint32_t b_shr2 = B >> 2;                     /* >>2 box */
+        uint32_t b_shr1 = B >> 1;                     /* >>1 box */
+        uint32_t maj    = (B & C) | (C & D);          /* & , & , | boxes */
+
+        uint32_t newA = E;                            /* E wraps to A */
+        uint32_t newB = A;                            /* A moves to B */
+        uint32_t newC = b_shr2 + E;                   /* lower-left + */
+        uint32_t newD = b_shr2 ^ b_shr1;              /* ^ box */
+        uint32_t newE = b_shr1 + maj + msg[i];        /* right-hand + */
+
+        A = newA;
+        B = newB;
+        C = newC;
+        D = newD;
+        E = newE;
+    }
+
+    SSHA2_state out = { A, B, C, D, E };
+    return out;
+}
